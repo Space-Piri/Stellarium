@@ -1,0 +1,43 @@
+﻿@page
+@model Stellarium.Pages.AuthModel
+@{
+	Layout = null;
+	<meta name="google-signin-client_id" content="564844095411-3nfvcdjnaj26u0qj1kkifi4849i3n6pl.apps.googleusercontent.com">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Stellarium.styles.css" asp-append-version="true" />
+	<script src="~/js/site.js" asp-append-version="true"></script>
+	<script src="https://apis.google.com/js/platform.js" async defer></script>
+	<title>Авторизация - Stellarium</title>
+
+	<body onload="OnLoadAuth()">
+
+	<div class="loginform" style="text-align:center">
+	<a style="margin:10px; height:50px; position:relative; bottom:20px; " asp-area="" asp-page="/Index"> <img class="icon"/></a>
+		<form method="post" asp-page-handler="Authorise" id="form" style="text-align:center">
+			<a id="text" asp-page="/Index">@Model.Username</a><br>
+			<button style="position:relative; left:-10px;" class="g-signin2" data-onsuccess="onSignIn">войти</button><br>
+		</form>
+		<a href="#" onclick="signOut();">Выход</a>
+	</div>
+
+	</body>
+
+	<script>
+	  function signOut() {
+		var auth2 = gapi.auth2.getAuthInstance();
+		auth2.signOut().then(function () {
+			console.log('User signed out.');
+			document.cookie = "username=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+			document.cookie = "useremail=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+			document.cookie = "userimg=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+			document.cookie = "userid=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+			document.cookie = "ismoderator=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+			window.localStorage.removeItem('username', null);
+			window.localStorage.removeItem('userimg', null);
+			window.localStorage.removeItem('useremail', null);
+			window.localStorage.removeItem('userid', null);
+			location.reload();
+		});
+	  }
+	</script>
+}

@@ -1,0 +1,103 @@
+﻿@using System.Web
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="google-signin-client_id" content="564844095411-3nfvcdjnaj26u0qj1kkifi4849i3n6pl.apps.googleusercontent.com">
+    <title>@ViewData["Title"] - Stellarium</title>
+    @*<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />*@
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Stellarium.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <a class="name" asp-area="" asp-page="/Index"> <img class="icon"/> Stellarium</a>
+        <i class="fa-solid fa-telescope"></i>
+        <form class="bookmarlform" >
+            <input name="search" class="search" placeholder="Поиск" asp-page="/Index"/>
+        </form>
+        @*<img id="userimage" class="userimage" width="30px"/>*@
+        <div class="login">
+            @if (HttpUtility.UrlDecode(@Context.Request.Cookies["username"]) != null)
+            {
+                <a style="background-color:orange; border-radius:5px; position:relative; bottom:11px; padding:3px 5px 3px 5px" asp-page="/PublicationEditor">Написать</a>
+                <img id="userimage" class="userimage" width="30px"/>
+                <a asp-page="/Profile" asp-route-id="@Context.Request.Cookies["userid"]" class="loginuser" id="login" ></a>
+            }
+            else
+            {
+                <a asp-page="/Auth" class="loginuser" id="login" >Вход</a>
+            }
+@*            @if(Context.Request.Cookies["username"]!=null&&Context.Request.Cookies["userimg"]!=null)
+            {
+                <img width="30px" src="@Context.Request.Cookies["userimg"].ToString();"/>
+                <span>@Context.Request.Cookies["username"].ToString()</span>
+            }
+            else
+            {
+                <span>Вход</span>
+            }*@
+            
+        </div>
+    </header>
+    <div align="left" class="navbar">
+        <ul class="navlist">
+            <li class="nav-item">
+                <i class="fa-solid fa-newspaper fa-customize"></i>
+                <a class="nav-link" asp-area="" asp-page="/Index" asp-route-section="">Недавнее</a>
+            </li>
+            <li class="nav-item">
+                <i class="fa-solid fa-bookmark fa-customize"></i>
+                @if (@Context.Request.Cookies["useremail"] != null)
+                {
+                    <a class="nav-link" asp-area="" asp-page="/Index" asp-route-section="Bookmarks">Избранное</a>
+                }
+                else
+                {
+                    <a class="nav-link-disabled" asp-area="" asp-page="" asp-route-section="Bookmarks" title="Для добавления публикаций в избранное необходимо авторизоватся">Избранное</a>
+                }
+            </li>
+            <li class="nav-item">
+                <i class="fa-solid fa-file-lines fa-customize"></i>
+                <a class="nav-link" asp-area="" asp-page="/Index" asp-route-section="Custom">Новости и статьи</a>
+            </li>
+            <li class="nav-item">
+                <i class="fa-solid fa-scale-balanced fa-customize"></i>
+                <a class="nav-link" asp-area="" asp-page="/RulesAndGuides">Правила и руководства</a>
+            </li>
+            <li class="nav-item">
+                <i class="fa-solid fa-elevator fa-customize"></i>
+                <a class="nav-link" asp-area="" asp-page="/Scoreboard">Рейтинг</a>
+            </li>
+            @if (@Context.Request.Cookies["ismoderator"] == "true")
+            {
+            <li class="nav-item">
+                <i class="fa-solid fa-screwdriver-wrench fa-customize"></i>
+                <a class="nav-link" asp-area="" asp-page="/Unpublished">Неопубликованные</a>
+            </li>
+            }
+        </ul>
+        <footer class="footer">
+            <button id="themetoggle" class="themetoggle"></button>
+            <br />
+            &copy; 2022 - Stellarium</a>
+        </footer>
+    </div>
+
+    <div align="center" class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+        </script>
+@*    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>*@
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://kit.fontawesome.com/5b3d357c36.js" crossorigin="anonymous"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,114 @@
+﻿@page
+@model Stellarium.Pages.PublicationModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@{
+    ViewData["Title"] = @Model.Publication.Publication.Title;
+	<div class="innerpublication">
+        <img class="authorimg" src="@Model.Publication.User.Icon"><span class="userspan"><a style="color:orange" asp-page="/Profile" asp-route-id="@Model.Publication.User.Id">@Model.Publication.User.Name.Replace('_', ' ')</a></span>
+            <div style="display:inline; top:2px" class="categories">
+                @for (var i = 0; i < @Model.Publication.Categories.Count; i++)
+                {
+                    <a asp-page="/Index" asp-route-section="@Model.Publication.Categories[i].Name">@Model.Publication.Categories[i].Name</a>
+                    if (i < @Model.Publication.Categories.Count-1)
+                    {
+                        @Html.Raw(" | ")
+                    }
+                }
+            </div>
+        <span class="userspan">@Model.Publication.Date</span><span class="userspan"><i class="fa-solid fa-eye fa-sm"></i> @Model.Publication.Views</span><br>
+        <h1 class="title">@Model.Publication.Publication.Title</h1>
+        @if (@Model.UserBookmark == null)
+        {
+            <form class="bookmarlform" method="post" asp-page-handler="AddBookMark" asp-route-id="@Model.Publication.Publication.Id">
+                <button class="bookmark" title="Добавить в избранное"><i class="fa-solid fa-bookmark"></i></button>
+            </form>
+        }
+        else
+        {
+            <form class="bookmarlform" method="post" asp-page-handler="DeleteBookMark" asp-route-id="@Model.Publication.Publication.Id">
+                <button class="bookmark" title="Удалить из избранного"><i class="fa-regular fa-bookmark"> </i></button>
+            </form>
+        }
+        <span class="ptext">
+            @Html.Raw(@Model.Publication.Publication.Text)
+        </span>
+        <hr>
+        @if (@Model.CurrentUser != null)
+        {
+            <form asp-page-handler="SendComment" method="post" asp-route-id="@Model.Publication.Publication.Id" enctype="multipart/form-data">
+            <img class="commentauthor1" width="50px" src="@Model.CurrentUser.Icon">
+            <textarea asp-for="Message.MessageText" placeholder="Оставить комментарий" type="text" class="inputcomment" name="text" onKeyUp="MessageText()" id="messageText"></textarea>
+            <br>
+                <button>Оставить комментарий</button>
+                @if (ViewData["Message"] != null)
+                {
+                    <div>Вы уже оставили такой комментарий</div>
+                }
+            </form>
+        }
+        else
+        {
+            <br />
+            <a asp-page="/Auth" class="loginuser">Авторизуйтесь для комментирования</a>
+            <br />
+        }
+        Всего @Model.Publication.Comments @Model.Publication.CommentsString
+        <hr>
+        <div class="comments">
+            @foreach (var comment in @Model.Comments.Where(c => c.AnsverAt == null).ToList())
+            {
+                <div class="comment">
+                    <img src="@comment.User.Icon" class="commentauthor" width="50px"> <span class="commentuserspan"><a style="color:orange" asp-page="/Profile" asp-route-id="@comment.User.Id">@comment.User.Name.Replace('_', ' ')</a> @comment.Date
+                    <form method="post" asp-page-handler="Answer" asp-route-id="@Model.Publication.Publication.Id" style="display:inline" enctype="multipart/form-data">
+                        <button style="color:orange; border:none"><i style="transform:scaleX(-1)" class="fa-solid fa-share"></i> Ответить</button>
+                        <input name="commentId" type="hidden" value="@comment.Comment.Id">
+                        <input id="answerText" name="answerText2" type="hidden" value="null">
+                    </form>
+                    @if (comment.User == Model.CurrentUser)
+                    {
+                        <form class="commentcrossform" method="post" asp-page-handler="DeleteComment" asp-route-id="@Model.Publication.Publication.Id">
+                            <button class="cross"><i class="fa-solid fa-xmark"></i></button>
+                            <input name="commentId" type="hidden" value="@comment.Comment.Id">
+                        </form>
+                    }
+                    @if (comment.User == Model.Publication.User)
+                    {
+                        <div style="display:inline; background-color: DarkCyan; border-radius:5px;">Автор</div>
+                    }
+                    </span>
+                    <br>
+                    <span class="commenttext">@Html.Raw(@comment.Comment.Text)</span>
+                    <div style="position:relative; left:30px">
+                        @foreach (var comment2 in @Model.Comments.ToList())
+                        {
+                            @if (comment2.AnsverAt != null)
+                            {
+                                @if (comment2.AnsverAt.Id == comment.Comment.Id)
+                                {
+                                <div class="comment">
+                                    <img src="@comment2.User.Icon" class="commentauthor" width="50px"> <span class="commentuserspan"><a style="color:orange" asp-page="/Profile" asp-route-id="@comment2.User.Id">@comment2.User.Name.Replace('_', ' ')</a> @comment2.Date
+                                    @if (comment2.User == Model.CurrentUser)
+                                    {
+                                        <form class="commentcrossform" method="post" asp-page-handler="DeleteComment" asp-route-id="@Model.Publication.Publication.Id">
+                                            <button class="cross"><i class="fa-solid fa-xmark"></i></button>
+                                            <input name="commentId" type="hidden" value="@comment2.Comment.Id">
+                                        </form>
+                                    }
+                                    @if (comment2.User == Model.Publication.User)
+                                    {
+                                        <div style="display:inline; background-color: DarkCyan; border-radius:5px;">Автор</div>
+                                    }
+                                    </span>
+                                    <br>
+                                    <span class="commenttext">@Html.Raw(@comment2.Comment.Text)</span>
+                                </div>
+                                }
+                            }
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+        <br />
+    </div>
+}

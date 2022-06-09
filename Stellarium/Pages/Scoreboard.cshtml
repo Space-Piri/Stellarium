@@ -1,0 +1,16 @@
+﻿@page
+@model Stellarium.Pages.ScoreboardModel
+@{
+	ViewData["Title"] = "Рейтинг пользователей";
+}
+<div class="scoreboard">
+	<h2 style="margin-right:330px">Рейтинг пользователей</h2>
+	<table style="margin-right:330px">
+		<tr><th width="75px" class="scoreth"><h3>Позиция</h3></th><th width="200px" class="scoreth"><h3>Пользователь</h3></th><th width="75px" class="scoreth"><h3>Рейтинг</h3></th></tr>
+
+		@for (int i = 0; @Model.Users.Count > i; i++)
+		{
+			<tr><td>@(i+1)</td><td><img class="authorimg" src="@Model.Users[i].Icon"><span class="userspan"><a style="color:orange" asp-page="/Profile" asp-route-id="@Model.Users[i].Id">@Model.Users[i].Name</a></span></td><td>@Model.Users[i].Score</td></tr>
+		}
+	</table>
+</div>

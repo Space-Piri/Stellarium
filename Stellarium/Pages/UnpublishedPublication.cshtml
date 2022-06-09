@@ -1,0 +1,28 @@
+﻿@page
+@model Stellarium.Pages.UnpublishedPublicationModel
+@{
+ViewData["Title"] = @Model.Publication.Publication.Title;
+    <div class="innerpublication">
+        <img class="authorimg" src="@Model.Publication.User.Icon"><span class="userspan"><a style="color:orange" asp-page="/Profile" asp-route-id="@Model.Publication.User.Id">@Model.Publication.User.Name.Replace('_', ' ')</a> <a style="color:orange" href="mailto: @Model.Publication.User.Email">@Model.Publication.User.Email</a></span><br>
+            <div style="display:inline; top:2px" class="categories">
+                @for (var i = 0; i < @Model.Publication.Categories.Count; i++)
+                {
+                    <a asp-page="/Index" asp-route-section="@Model.Publication.Categories[i].Name">@Model.Publication.Categories[i].Name</a>
+                    if (i < @Model.Publication.Categories.Count-1)
+                    {
+                        @Html.Raw(" | ")
+                    }
+                }
+            </div><br>
+        <h1 class="title">@Model.Publication.Publication.Title</h1>
+        <span class="ptext">
+            @Html.Raw(@Model.Publication.Publication.Text)
+        </span>
+        <form asp-page-handler="Publicate" method="post" asp-route-id="@Model.Publication.Publication.Id" style="display:inline">
+                <button style="display:inline">Одобрить и опубликовать</button>
+        </form>
+        <form asp-page-handler="Delete" method="post" asp-route-id="@Model.Publication.Publication.Id" style="display:inline">
+            <button style="display:inline">Удалить</button>
+        </form>
+    </div>
+}

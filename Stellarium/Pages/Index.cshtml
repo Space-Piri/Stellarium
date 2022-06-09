@@ -1,0 +1,167 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Главная";
+    if (Model.Search != null)
+    {
+        ViewData["Title"] = "Поиск";
+    }
+    if (Model.Section != null)
+    {
+        if (Model.Section == "Custom")
+        {
+            ViewData["Title"] = "Новости и статьи";
+        }
+        else
+        {
+            ViewData["Title"] = Model.Section;
+        }
+        //if (Model.Section == "Bookmarks")
+        //{
+            //ViewData["Title"] = "Избранное - " + Model.CurrentUser.Name.Replace('_', ' ');
+        //}
+    }
+}
+
+<div class="publications">
+    @if (@Model.Search != null)
+    {
+        <div class="searchText">Поиск по запросу: "@Model.Search"
+            <button id="advancedSearchButton" onclick="AdvancedSearchShow()">Расширенный поиск</button>
+            <form method="get" id="advancedSearch" class="advancedSearch"><br>
+                Написан не раньше: <input name="from" type="date" value="@Model.From"><br><br>
+                Написан не позже: <input name="to" type="date" value="@Model.To"><br><br>
+                <select asp-for="Category" width="100px" name="category" value="@Model.Category">
+                    <option value="">Любая категория</option>
+                    <option value="Статьи">Статья</option>
+                    <option value="Новости">Новости</option>
+                    <option value="Экзопланеты">Экзопланеты</option>
+                    <option value="Наука">Наука</option>
+                    <option value="Наука">Технологии</option>
+                </select>
+                <input name="search" type="hidden" value="@Model.Search"/>
+                <button type="submit">Поиск</button>
+            </form>
+        </div>
+        @if (@Model.Publications.Count == 0)
+        {
+            <span>По запросу ничего не найдено</span>
+        }
+    }
+    @switch (Model.Section)
+    {
+        case "Custom":
+            <div style="padding:10px">
+                <form method="get">
+                <select asp-for="Category" width="100px" name="category" value="@Model.Category">
+                    <option value="">Любая категория</option>
+                    <option value="Статьи">Статья</option>
+                    <option value="Новости">Новости</option>
+                    <option value="Экзопланеты">Экзопланеты</option>
+                    <option value="Наука">Наука</option>
+                    <option value="Технологии">Технологии</option>
+                </select>
+                <select asp-for="Sort" width="100px" name="sort" value="@Model.Sort">
+                    <option value="datedec">Дата по убыванию</option>
+                    <option value="dateasc">Дата по возрастанию</option>
+                    <option value="viewsdes">Количество просмотров по убыванию</option>
+                    <option value="viewsasc">Количество просмотров по возрастанию</option>
+                </select>
+                <input name="section" type="hidden" value="Custom"/>
+                <button type="submit">Отсортировать</button>
+                </form>
+            </div>
+
+        break;
+        case "Bookmarks":
+            <h3>Ваше избранное</h3>
+        break;
+        case "Новости":
+            <h3>@Model.Section</h3>
+            <span>Небольшие материалы, в которых рассматривается одно определённое событие или сообщение.</span>
+        break;
+        case "Статьи":
+            <h3>@Model.Section</h3>
+            <span>Развёрнутые материалы, раскрывающие детали и дающие подробную информацию о явлении, личности или событии.</span>
+        break;
+        case "Экзопланеты":
+            <h3>@Model.Section</h3>
+            <span>Развёрнутые материалы, раскрывающие детали и дающие подробную информацию о экзопланетах.</span>
+        break;
+        case "Тест":
+            <h3>@Model.Section</h3>
+            <span>Материалы для отладки форума.</span>
+            break;
+        case "Наука":
+            <h3>@Model.Section</h3>
+            <span>В этой рубрике собраны материалы о научных открытиях в самых различных областях изучения космоса – от планетологии до физики компактных объектов.</span>
+            break;
+        case "Технологии":
+            <h3>@Model.Section</h3>
+            <span>В этом разделе собраны материалы о забытых, новых или перспективных технологиях.</span>
+        break;
+    }
+@*    @if (Model.Publications.Count == 0 && Model.UserBookmarks.Count == 0)
+    {
+        <span>Не расстраивайтесь, вы ещё найдёте что нибудь избранное для себя</span>
+    }*@
+    @foreach (var publication in @Model.Publications)
+    {
+        <div class="publication">
+            <img class="authorimg" src="@publication.User.Icon"><span class="userspan"><a style="color:orange" asp-page="/Profile" asp-route-id="@publication.User.Id">@publication.User.Name.Replace('_', ' ')</a></span><span class="userspan">@publication.Date</span><br>
+            <h3 class="title"><a class="pba" asp-route-id="@publication.Publication.Id" asp-page="/Publication">@publication.Publication.Title</a>
+            </h3>
+            <br>
+            <div class="categories">
+                @for (var i = 0; i < @publication.Categories.Count; i++)
+                {
+                    <a asp-page="/Index" asp-route-section="@publication.Categories[i].Name">@publication.Categories[i].Name</a>
+                    if (i < @publication.Categories.Count-1)
+                    {
+                        @Html.Raw(" | ")
+                    }
+                }
+            </div>
+            <span class="titletext">@publication.Publication.TitleText</span><br>
+            <img class="pbimg" src="@publication.Publication.Image"><br>
+            <i class="fa-solid fa-eye"></i> @publication.Views <i class="fa-solid fa-message"></i> @publication.Comments
+            @if (@Model.UserBookmarks.FirstOrDefault(b => b.PublicationId == publication.Publication.Id) == null)
+            {
+                <form class="bookmarlform" method="post" asp-page-handler="AddBookMark" asp-route-id="@publication.Publication.Id" asp-route-section="@Model.Section">
+                    <button class="bookmarkouter" title="Добавить в избранное"><i class="fa-solid fa-bookmark"></i></button>
+                    <input name="search" type="hidden" value="@Model.Search"/>
+                    <input name="from" type="hidden" value="@Model.From"/>
+                    <input name="to" type="hidden" value="@Model.To"/>
+                    <input name="category" type="hidden" value="@Model.Category"/>
+                    <input name="sort" type="hidden" value="@Model.Sort"/>
+                    <input name="show" type="hidden" value="@Model.Show"/>
+                </form>
+            }
+            else
+            {
+                <form class="bookmarlform" method="post" asp-page-handler="DeleteBookMark" asp-route-id="@publication.Publication.Id" asp-route-section="@Model.Section">
+                    <button class="bookmarkouter" title="Удалить из избранного"><i class="fa-regular fa-bookmark"> </i></button>
+                    <input name="search" type="hidden" value="@Model.Search"/>
+                    <input name="from" type="hidden" value="@Model.From"/>
+                    <input name="to" type="hidden" value="@Model.To"/>
+                    <input name="category" type="hidden" value="@Model.Category"/>
+                    <input name="sort" type="hidden" value="@Model.Sort"/>
+                    <input name="show" type="hidden" value="@Model.Show"/>
+                </form>
+            }
+            <br />
+        </div>
+        @if (Model.Publications.Count > 10)
+        {
+            <form method="post" asp-page-handler="LoadMore">
+                <button >Загрузить ещё</button>
+                <input name="search" type="hidden" value="@Model.Search"/>
+                <input name="from" type="hidden" value="@Model.From"/>
+                <input name="to" type="hidden" value="@Model.To"/>
+                <input name="category" type="hidden" value="@Model.Category"/>
+                <input name="sort" type="hidden" value="@Model.Sort"/>
+                <input name="show" type="hidden" value="@Model.Show"/>
+            </form>
+        }
+    }
+</div>

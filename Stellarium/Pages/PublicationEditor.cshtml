@@ -1,0 +1,43 @@
+﻿@page
+@model Stellarium.Pages.PublicationEditorModel
+@{
+	<script src="https://cdn.tiny.cloud/1/ezgx0agjrvbx2j0d6yv6qyprmpzhr7i7fgot1tq8h7z5o4a0/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+      tinymce.init({
+        selector: '#mytextarea'
+      });
+    </script>
+	<div class="editor">
+		<form method="post" class="editorform" asp-page-handler="Write" enctype="multipart/form-data">
+			<span class="editorspan">Заголовок</span><br>
+			<input style="width:100%" type="text" name="title"><br>
+
+			<span>Краткое описание</span><br>
+			<textarea name="titletext" class="inputeditortext" style="resize: none; height:100px;"></textarea><br>
+
+			<span>Выбор категорий</span><br>
+			<select name="firstcategory">
+                <option value="Статьи">Статья</option>
+                <option value="Новости">Новость</option>
+                <option value="Экзопланеты">Экзопланеты</option>
+                <option value="Наука">Наука</option>
+				<option value="Наука">Технологии</option>
+			</select>
+			<select name="secondcategory">
+			    <option>Без категории</option>
+                <option value="Статьи">Статья</option>
+                <option value="Новости">Новость</option>
+                <option value="Экзопланеты">Экзопланеты</option>
+                <option value="Наука">Наука</option>
+				<option value="Наука">Технологии</option>
+			</select><br>
+
+			<span>Обложка</span><br>
+            <input asp-for="FileUpload.FormFile" style="border:none" type="file" accept="image/png, image/jpeg, image/jpg">
+
+			<h3>Содержание</h3><br>
+			<textarea id="mytextarea" name="text" class="inputeditortext"></textarea><br>
+			<button type="submit">Отправить на проверку</button>
+		</form>
+	</div>
+}

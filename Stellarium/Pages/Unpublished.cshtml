@@ -1,0 +1,27 @@
+﻿@page
+@model Stellarium.Pages.UnpublishedModel
+@{
+    <div class="publications">
+	@foreach (var publication in @Model.Publications)
+    {
+        <div class="publication">
+            <img class="authorimg" src="@publication.User.Icon"><span class="userspan"><a style="color:orange" asp-page="/Profile" asp-route-id="@publication.User.Id">@publication.User.Name.Replace('_', ' ')</a></span><span class="userspan">@publication.Date</span><br>
+            <h3 class="title"><a class="pba" asp-route-id="@publication.Publication.Id" asp-page="/UnpublishedPublication">@publication.Publication.Title</a>
+            </h3>
+            <br>
+            <div class="categories">
+                @for (var i = 0; i < @publication.Categories.Count; i++)
+                {
+                    <a asp-page="/Index" asp-route-section="@publication.Categories[i].Name">@publication.Categories[i].Name</a>
+                    if (i < @publication.Categories.Count-1)
+                    {
+                        @Html.Raw(" | ")
+                    }
+                }
+            </div>
+            <span class="titletext">@publication.Publication.TitleText</span><br>
+            <img class="pbimg" src="@publication.Publication.Image"><br>
+        </div>
+    }
+    </div>
+}

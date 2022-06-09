@@ -1,0 +1,65 @@
+﻿@page
+@model Stellarium.Pages.ProfileModel
+@{
+	 ViewData["Title"] = "Профиль - " + @Model.User.Name.Replace('_', ' ');
+	 <div class="profile">
+		 <div class="profileheader">
+            <div style="width:70px; position:relative; right:15px">
+	 		<img style="width:70px" src="@Model.User.Icon">
+            </div>
+
+            <div style=" position:relative; bottom:80px; left:60px">
+            <span class="userspan">@Model.User.Name.Replace('_', ' ')</span><span class="userspan"> Рейтинг = @Model.User.Score</span>
+            @if (Model.CurrentUser == Model.User)
+            {
+                    <a style="bottom:-2px;" asp-page="/Auth" class="loginuser" id="login">Выход</a>
+            }
+            else
+            {
+                <a style="color:orange" href="mailto: @Model.User.Email">@Model.User.Email</a>
+            }
+            <br>
+			<span class="userspan">Дата регистрации: @Model.RegDate</span><br>
+			<span class="userspan">Был(а) онлайн: @Model.LastOnline</span><br>
+            </div>
+		 </div>
+	 </div>
+
+     <div class="publicationsprofile">
+	 @foreach (var publication in @Model.Publications)
+     {
+        <div class="publication">
+            <img class="authorimg" src="@publication.User.Icon"><span class="userspan"><a style="color:orange" asp-page="/Profile" asp-route-id="@publication.User.Id">@publication.User.Name.Replace('_', ' ')</a></span><span class="userspan">@publication.Date</span><br>
+            <h3 class="title"><a class="pba" asp-route-id="@publication.Publication.Id" asp-page="/Publication">@publication.Publication.Title</a>
+            </h3>
+            <br>
+            <div class="categories">
+                @for (var i = 0; i < @publication.Categories.Count; i++)
+                {
+                    <a asp-page="/Index" asp-route-section="@publication.Categories[i].Name">@publication.Categories[i].Name</a>
+                    if (i < @publication.Categories.Count-1)
+                    {
+                        @Html.Raw(" | ")
+                    }
+                }
+            </div>
+            <span class="titletext">@publication.Publication.TitleText</span><br>
+            <img class="pbimg" src="@publication.Publication.Image"><br>
+            <i class="fa-solid fa-eye"></i> @publication.Views <i class="fa-solid fa-message"></i> @publication.Comments
+            @if (@Model.UserBookmarks.FirstOrDefault(b => b.PublicationId == publication.Publication.Id) == null)
+            {
+                <form class="bookmarlform" method="post" asp-page-handler="AddBookMark" asp-route-userid="@Model.User.Id" asp-route-id="@publication.Publication.Id">
+                    <button class="bookmarkouter" title="Добавить в избранное"><i class="fa-solid fa-bookmark"></i></button>
+                </form>
+            }
+            else
+            {
+                <form class="bookmarlform" method="post" asp-page-handler="DeleteBookMark" asp-route-userid="@Model.User.Id" asp-route-id="@publication.Publication.Id">
+                    <button class="bookmarkouter" title="Удалить из избранного"><i class="fa-regular fa-bookmark"> </i></button>
+                </form>
+            }
+            <br />
+        </div>
+        }
+        </div>
+}
